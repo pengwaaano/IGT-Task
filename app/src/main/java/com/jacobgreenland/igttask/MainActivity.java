@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity{
         FragmentTransaction ft = fragmentManager.beginTransaction();
 
         ft.add(R.id.mainFragment, f, "tabs");
-        //ft.addToBackStack(null);
+        ft.addToBackStack(null);
         ft.commit();
 
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.snackbarPosition);
@@ -104,9 +104,10 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "test", Toast.LENGTH_LONG).show();
                 //What to do on back clicked
+                //fragmentManager.popBackStack();
                 onBackPressed();
             }
-            });
+        });
         admiral.make(coordinatorLayout, "No Internet Connection",Snackbar.LENGTH_INDEFINITE);
         //initialiseFloatingButton();
     }
@@ -120,9 +121,11 @@ public class MainActivity extends AppCompatActivity{
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
     }
-    @Override
+
     public void onBackPressed() {
 
+        //super.onBackPressed();
+        Log.i("MainActivity", "" + fragmentManager.getBackStackEntryCount());
         if (fragmentManager.getBackStackEntryCount() > 0) {
             Log.i("MainActivity", "popping backstack");
             fragmentManager.popBackStack();
@@ -141,27 +144,17 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.home) {
-            Log.d("test","back");
-            return true;
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                FragmentManager fm = getSupportFragmentManager();
+                if (fm.getBackStackEntryCount() > 0) {
+                    fm.popBackStack();
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
-    }
-
-    public void switchFragment(Fragment f)
-    {
-        //Set starting fragment to Tabs
-        fragmentManager = getSupportFragmentManager();
-        FragmentTransaction ft = fragmentManager.beginTransaction();
-        ft.replace(R.id.mainFragment, f, "tabs");
-        //ft.addToBackStack(null);
-        ft.commit();
     }
 
     public void switchContent(int id, Fragment fragment, View view) {
@@ -181,6 +174,7 @@ public class MainActivity extends AppCompatActivity{
         super.onStop();
         unregisterReceiver(broadcastReceiver);
     }
+
     private void installListener(final Snackbar snack) {
 
         if (broadcastReceiver == null) {
